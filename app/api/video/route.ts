@@ -7,7 +7,17 @@ import { NextRequest, NextResponse } from "next/server";
 export async function GET() {
   try {
     await connectToDatabase();
-    const videos = await Video.find({}).sort({ createdAt: -1 }).lean();
+    const videos = await Video.find({})
+      .sort({ createdAt: -1 })
+      .lean()
+      .then((docs) =>
+        docs.map((doc) => ({
+          ...doc,
+          _id: doc._id.toString(),
+          createdAt: doc.createdAt?.toISOString(),
+          updatedAt: doc.updatedAt?.toISOString(),
+        }))
+      );
 
     if (!videos || videos.length === 0) {
       return NextResponse.json([], { status: 200 });

@@ -13,7 +13,9 @@ interface UploadResponse {
 export default function VideoUploadForm() {
   const [loading, setLoading] = useState(false);
   const [videoFile, setVideoFile] = useState<UploadResponse | null>(null);
-  const [thumbnailFile, setThumbnailFile] = useState<UploadResponse | null>(null);
+  const [thumbnailFile, setThumbnailFile] = useState<UploadResponse | null>(
+    null
+  );
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
@@ -66,9 +68,7 @@ export default function VideoUploadForm() {
                  rounded-2xl shadow-lg border border-gray-200
                  p-8 space-y-6"
     >
-      <h2 className="text-xl font-bold text-gray-800">
-        Upload Video
-      </h2>
+      <h2 className="text-xl font-bold text-gray-800">Upload Video</h2>
 
       {/* Title */}
       <div>
@@ -80,8 +80,12 @@ export default function VideoUploadForm() {
           required
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg
-                     focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Enter a title for your video"
+          className="w-full px-4 py-2
+             bg-white text-gray-900
+             placeholder:text-gray-400
+             border border-gray-300 rounded-lg
+             focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
@@ -95,33 +99,57 @@ export default function VideoUploadForm() {
           rows={4}
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg
-                     focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Briefly describe what this video is about"
+          className="w-full px-4 py-2
+             bg-white text-gray-900
+             placeholder:text-gray-400
+             border border-gray-300 rounded-lg
+             focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       {/* Video Upload */}
       <div>
-        <label className="block text-sm font-medium text-gray-600 mb-2">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
           Video File
         </label>
-        <FileUpload
-          fileType="video"
-          onSuccess={(res) => setVideoFile(res)}
-        />
+
+        <div
+          className="bg-white text-gray-900
+               border border-gray-300 rounded-xl
+               p-4 hover:border-blue-500
+               transition"
+        >
+          <FileUpload fileType="video" onSuccess={(res) => setVideoFile(res)} />
+        </div>
+
+        {videoFile && (
+          <p className="mt-2 text-sm text-gray-600">
+            Selected: {videoFile.name || "video file"}
+          </p>
+        )}
       </div>
 
       {/* Thumbnail Upload */}
       <div>
-        <label className="block text-sm font-medium text-gray-600 mb-2">
+        <label className="block text-sm font-medium text-gray-700 mb-2">
           Thumbnail (optional)
         </label>
-        <FileUpload
-          fileType="image"
-          onSuccess={(res) => setThumbnailFile(res)}
-        />
+
+        <div
+          className="bg-white text-gray-900
+               border border-gray-300 rounded-xl
+               p-4 hover:border-blue-500
+               transition"
+        >
+          <FileUpload
+            fileType="image"
+            onSuccess={(res) => setThumbnailFile(res)}
+          />
+        </div>
+
         {thumbnailFile && (
-          <p className="mt-2 text-sm text-gray-500">
+          <p className="mt-2 text-sm text-gray-600">
             Selected: {thumbnailFile.name || "thumbnail image"}
           </p>
         )}
