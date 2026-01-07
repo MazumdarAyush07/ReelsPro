@@ -17,6 +17,7 @@ export interface IVideo {
     width: number;
     quality?: number;
   };
+  likesCount: number;
 }
 const videoSchema = new Schema<IVideo>(
   {
@@ -30,6 +31,7 @@ const videoSchema = new Schema<IVideo>(
       width: { type: Number, default: VIDEO_DIMENSIONS.width },
       quality: { type: Number, min: 1, max: 100 },
     },
+    likesCount: { type: Number, default: 0 },
   },
   {
     timestamps: true,
