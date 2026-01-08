@@ -18,6 +18,7 @@ export interface IVideo {
     quality?: number;
   };
   likesCount: number;
+  commentsCount?: number;
 }
 const videoSchema = new Schema<IVideo>(
   {
@@ -31,12 +32,15 @@ const videoSchema = new Schema<IVideo>(
       width: { type: Number, default: VIDEO_DIMENSIONS.width },
       quality: { type: Number, min: 1, max: 100 },
     },
-    likesCount: { type: Number, default: 0 },
+    likesCount: { type: Number, default: 0, min: 0 },
+    commentsCount: { type: Number, default: 0, min: 0 },
   },
   {
     timestamps: true,
   }
 );
+
+videoSchema.index({ createdAt: -1 });
 
 const Video = models?.Video || model<IVideo>("Video", videoSchema);
 
