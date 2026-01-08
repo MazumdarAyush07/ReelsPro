@@ -3,6 +3,7 @@
 import { IKVideo } from "imagekitio-react";
 import { IVideo } from "@/models/Video";
 import { useEffect, useState } from "react";
+import CommentSheet from "./CommentSheet";
 
 export default function VideoComponent({ video }: { video: IVideo }) {
   const videoId = String(video._id);
@@ -16,6 +17,9 @@ export default function VideoComponent({ video }: { video: IVideo }) {
 
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(video.likesCount ?? 0);
+  const [showComments, setShowComments] = useState(false);
+  const [commentsCount, setCommentsCount] = useState(video.commentsCount ?? 0);
+
   const [loading, setLoading] = useState(false);
 
   // fetch like status
@@ -69,7 +73,7 @@ export default function VideoComponent({ video }: { video: IVideo }) {
       <IKVideo
         path={videoPath}
         transformation={[{ height: "1920", width: "1080" }]}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-cover pointer-events-none"
         autoPlay
         muted
         loop
@@ -81,9 +85,9 @@ export default function VideoComponent({ video }: { video: IVideo }) {
       <button
         onClick={toggleLike}
         disabled={loading}
-        className="absolute right-4 bottom-24
-                   flex flex-col items-center gap-1
-                   text-white"
+        className="absolute right-4 bottom-24 z-30
+             flex flex-col items-center gap-1
+             text-white"
       >
         <span
           className={`text-3xl transition-transform ${
@@ -95,11 +99,22 @@ export default function VideoComponent({ video }: { video: IVideo }) {
         <span className="text-xs text-gray-200">{likesCount}</span>
       </button>
 
+      {/* Comment Button */}
+      <button
+        onClick={() => setShowComments(true)}
+        className="absolute right-4 bottom-6 z-30
+             flex flex-col items-center gap-1
+             text-white"
+      >
+        <span className="text-3xl">💬</span>
+        <span className="text-xs text-gray-200">{commentsCount}</span>
+      </button>
+
       {/* Overlay content */}
       <div
-        className="absolute bottom-0 left-0 right-0
-                   bg-gradient-to-t from-black/80 via-black/40 to-transparent
-                   p-4"
+        className="absolute bottom-0 left-0 right-0 z-10
+             bg-gradient-to-t from-black/80 via-black/40 to-transparent
+             p-4 pointer-events-none"
       >
         <h2 className="text-white font-semibold text-base line-clamp-2">
           {video.title}
@@ -108,6 +123,14 @@ export default function VideoComponent({ video }: { video: IVideo }) {
           {video.description}
         </p>
       </div>
+      {showComments && (
+        <CommentSheet
+          videoId={videoId}
+          onClose={() => setShowComments(false)}
+          onCommentAdded={() => setCommentsCount((c) => c + 1)}
+          onCommentDeleted={() => setCommentsCount((c) => Math.max(c - 1, 0))}
+        />
+      )}
     </div>
   );
 }

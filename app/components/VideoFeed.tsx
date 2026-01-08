@@ -16,12 +16,16 @@ export default function VideoFeed({ videos }: VideoFeedProps) {
 
   return (
     <div
-      className="flex flex-col items-center gap-16
-                 snap-y snap-mandatory
-                 overflow-y-auto"
+      className="
+        flex-1
+        overflow-y-auto
+        snap-y snap-mandatory
+        flex flex-col items-center
+        gap-12
+      "
     >
       {videos.map((video) => (
-        <div key={String(video._id)} className="snap-start">
+        <div key={String(video._id)} className="snap-start flex justify-center">
           <VideoComponent video={video} />
         </div>
       ))}

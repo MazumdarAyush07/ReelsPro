@@ -82,7 +82,9 @@ export async function POST(request: NextRequest) {
       { new: true }
     );
 
-    return NextResponse.json({ message: newComment }, { status: 201 });
+    const populatedComment = await newComment.populate("user", "email _id");
+
+    return NextResponse.json({ message: populatedComment }, { status: 201 });
   } catch (error) {
     return NextResponse.json(
       { error: "Failed to add comment" },
