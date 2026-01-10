@@ -2,7 +2,7 @@
 
 import { IKVideo } from "imagekitio-react";
 import { IVideo } from "@/models/Video";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import CommentSheet from "./CommentSheet";
 
 export default function VideoComponent({ video }: { video: IVideo }) {
@@ -14,7 +14,10 @@ export default function VideoComponent({ video }: { video: IVideo }) {
   }
 
   const videoPath = getImageKitPath(video.videoUrl);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
+  const [paused, setPaused] = useState(false);
+  const [showPlayIcon, setShowPlayIcon] = useState(false);
   const [liked, setLiked] = useState(false);
   const [likesCount, setLikesCount] = useState(video.likesCount ?? 0);
   const [showComments, setShowComments] = useState(false);
@@ -62,12 +65,30 @@ export default function VideoComponent({ video }: { video: IVideo }) {
     }
   }
 
+  function togglePlayPause() {
+    const videoEl = containerRef.current?.querySelector("video");
+    if (!videoEl) return;
+
+    if (videoEl.paused) {
+      videoEl.play();
+      setPaused(false);
+    } else {
+      videoEl.pause();
+      setPaused(true);
+    }
+
+    setShowPlayIcon(true);
+    setTimeout(() => setShowPlayIcon(false), 700);
+  }
+
   return (
     <div
+      ref={containerRef}
       className="relative w-full max-w-md
                  h-[85vh]
                  bg-black rounded-2xl
                  shadow-xl overflow-hidden"
+      onClick={togglePlayPause}
     >
       {/* Video */}
       <IKVideo
@@ -83,7 +104,10 @@ export default function VideoComponent({ video }: { video: IVideo }) {
 
       {/* Like Button */}
       <button
-        onClick={toggleLike}
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleLike();
+        }}
         disabled={loading}
         className="absolute right-4 bottom-24 z-30
              flex flex-col items-center gap-1
@@ -101,7 +125,10 @@ export default function VideoComponent({ video }: { video: IVideo }) {
 
       {/* Comment Button */}
       <button
-        onClick={() => setShowComments(true)}
+        onClick={(e) => {
+          e.stopPropagation();
+          setShowComments(true);
+        }}
         className="absolute right-4 bottom-6 z-30
              flex flex-col items-center gap-1
              text-white"
@@ -109,6 +136,15 @@ export default function VideoComponent({ video }: { video: IVideo }) {
         <span className="text-3xl">💬</span>
         <span className="text-xs text-gray-200">{commentsCount}</span>
       </button>
+
+      {/* Play/Pause Icon */}
+      {showPlayIcon && (
+        <div className="absolute inset-0 z-30 flex items-center justify-center pointer-events-none">
+          <div className="bg-black/60 rounded-full p-4">
+            <span className="text-white text-4xl">{paused ? "▶️" : "⏸️"}</span>
+          </div>
+        </div>
+      )}
 
       {/* Overlay content */}
       <div
