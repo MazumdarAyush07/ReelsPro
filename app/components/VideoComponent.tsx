@@ -5,7 +5,15 @@ import { IVideo } from "@/models/Video";
 import { useEffect, useRef, useState } from "react";
 import CommentSheet from "./CommentSheet";
 
-export default function VideoComponent({ video }: { video: IVideo }) {
+export default function VideoComponent({
+  video,
+  isActive,
+  onVideoReady,
+}: {
+  video: IVideo;
+  isActive: boolean;
+  onVideoReady: (el: HTMLVideoElement) => void;
+}) {
   const videoId = String(video._id);
 
   function getImageKitPath(url: string) {
@@ -24,6 +32,26 @@ export default function VideoComponent({ video }: { video: IVideo }) {
   const [commentsCount, setCommentsCount] = useState(video.commentsCount ?? 0);
 
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const videoEl = containerRef.current?.querySelector("video");
+    if (videoEl) {
+      onVideoReady(videoEl);
+    }
+  }, []);
+
+  useEffect(() => {
+    const videoEl = containerRef.current?.querySelector("video");
+    if (!videoEl) return;
+
+    if (isActive) {
+      videoEl.play().catch(() => {});
+      setPaused(false);
+    } else {
+      videoEl.pause();
+      setPaused(true);
+    }
+  }, [isActive]);
 
   // fetch like status
   useEffect(() => {
