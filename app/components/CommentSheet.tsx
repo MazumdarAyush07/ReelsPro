@@ -71,6 +71,7 @@ export default function CommentSheet({
   }
 
   async function submitComment() {
+    if (!currentUserId) return;
     if (!content.trim()) return;
     setLoading(true);
 
@@ -95,13 +96,10 @@ export default function CommentSheet({
 
   async function deleteComment(commentId: string) {
     try {
-      const res = await fetch(
-        `/api/comment?commentId=${commentId}&videoId=${videoId}`,
-        {
-          method: "DELETE",
-          credentials: "include",
-        }
-      );
+      const res = await fetch(`/api/comment?commentId=${commentId}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
 
       if (!res.ok) throw new Error();
 
@@ -160,21 +158,29 @@ export default function CommentSheet({
         </div>
 
         {/* Input */}
-        <div className="border-t px-4 py-3 flex gap-2">
-          <input
-            value={content}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Add a comment..."
-            className="flex-1 border text-gray-800 rounded-full px-4 py-2 text-sm
-                       focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <button
-            disabled={loading}
-            onClick={submitComment}
-            className="text-blue-600 font-semibold"
-          >
-            Post
-          </button>
+        <div className="border-t px-4 py-3 flex gap-2 items-center">
+          {currentUserId ? (
+            <>
+              <input
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Add a comment..."
+                className="flex-1 border text-gray-800 rounded-full px-4 py-2 text-sm
+                           focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+              <button
+                disabled={loading}
+                onClick={submitComment}
+                className="text-blue-600 font-semibold"
+              >
+                Post
+              </button>
+            </>
+          ) : (
+            <p className="text-sm text-gray-500">
+              Log in to add a comment.
+            </p>
+          )}
         </div>
       </div>
     </>

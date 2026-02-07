@@ -7,12 +7,6 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
     await connectToDatabase();
 
     const { searchParams } = new URL(request.url);
@@ -107,9 +101,9 @@ export async function DELETE(request: NextRequest) {
     const commentId = searchParams.get("commentId");
     const videoId = searchParams.get("videoId");
 
-    if (!commentId || !videoId) {
+    if (!commentId) {
       return NextResponse.json(
-        { error: "Missing commentId or videoId" },
+        { error: "Missing commentId" },
         { status: 400 }
       );
     }
@@ -124,10 +118,17 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
+    if (videoId && comment.video.toString() !== videoId) {
+      return NextResponse.json(
+        { error: "Comment does not belong to video" },
+        { status: 400 }
+      );
+    }
+
     await Comment.findByIdAndDelete(commentId);
 
     await Video.updateOne(
-      { _id: videoId },
+      { _id: comment.video },
       [
         {
           $set: {
@@ -136,8 +137,7 @@ export async function DELETE(request: NextRequest) {
             },
           },
         },
-      ],
-      { updatePipeline: true }
+      ]
     );
 
     return NextResponse.json(
