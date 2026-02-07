@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const session = await getServerSession(authOptions);
 
     if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ liked: false }, { status: 200 });
     }
     await connectToDatabase();
 
@@ -117,10 +117,17 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Missing videoId" }, { status: 400 });
     }
 
-    await Like.findOneAndDelete({
+    const deletedLike = await Like.findOneAndDelete({
       user: session.user.id,
       video: videoId,
     });
+
+    if (!deletedLike) {
+      return NextResponse.json(
+        { message: "Like already removed" },
+        { status: 200 }
+      );
+    }
 
     await Video.updateOne(
       { _id: videoId },
@@ -132,8 +139,7 @@ export async function DELETE(request: NextRequest) {
             },
           },
         },
-      ],
-      { updatePipeline: true } 
+      ]
     );
 
     return NextResponse.json(

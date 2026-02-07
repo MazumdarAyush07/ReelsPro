@@ -40,7 +40,7 @@ export default function VideoComponent({
     if (videoEl) {
       onVideoReady(videoEl);
     }
-  }, []);
+  }, [onVideoReady]);
 
   useEffect(() => {
     const videoEl = containerRef.current?.querySelector("video");
